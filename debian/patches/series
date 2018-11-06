@@ -1,0 +1,6 @@
+0002-Make-sure-signature-stays-the-same-in-all-nginx-buil.patch
+0003-define_gnu_source-on-other-glibc-based-platforms.patch
+ubuntu-branding.patch
+CVE-2018-16843.patch
+CVE-2018-16844.patch
+CVE-2018-16845.patch
