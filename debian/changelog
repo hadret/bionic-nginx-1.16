@@ -1,3 +1,10 @@
+nginx (1.16.0-0bionic0) bionic; urgency=medium
+
+  * Non-maintainer upload
+  * New upstream stable release (1.16.0)
+
+ -- Filip Chabik <hadret@gmail.com>  Fri, 26 Apr 2019 13:11:48 +0000
+
 nginx (1.14.0-0ubuntu1.2) bionic-security; urgency=medium
 
   * SECURITY UPDATE: excessive memory consumption in HTTP/2 implementation

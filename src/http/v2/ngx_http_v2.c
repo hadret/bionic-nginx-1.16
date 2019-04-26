@@ -270,8 +270,6 @@ ngx_http_v2_init(ngx_event_t *rev)
 
     h2c->frame_size = NGX_HTTP_V2_DEFAULT_FRAME_SIZE;
 
-    h2c->table_update = 1;
-
     h2scf = ngx_http_get_module_srv_conf(hc->conf_ctx, ngx_http_v2_module);
 
     h2c->concurrent_pushes = h2scf->concurrent_pushes;
@@ -664,6 +662,7 @@ ngx_http_v2_handle_connection(ngx_http_v2_connection_t *h2c)
 
     h2c->pool = NULL;
     h2c->free_frames = NULL;
+    h2c->frames = 0;
     h2c->free_fake_connections = NULL;
 
 #if (NGX_HTTP_SSL)
@@ -2075,6 +2074,11 @@ ngx_http_v2_state_settings_params(ngx_http_v2_connection_t *h2c, u_char *pos,
             h2c->concurrent_pushes = ngx_min(value, h2scf->concurrent_pushes);
             break;
 
+        case NGX_HTTP_V2_HEADER_TABLE_SIZE_SETTING:
+
+            h2c->table_update = 1;
+            break;
+
         default:
             break;
         }
@@ -2616,17 +2620,12 @@ ngx_http_v2_push_stream(ngx_http_v2_stream_t *parent, ngx_str_t *path)
     r->method_name = ngx_http_core_get_method;
     r->method = NGX_HTTP_GET;
 
-    r->schema_start = (u_char *) "https";
-
-#if (NGX_HTTP_SSL)
-    if (fc->ssl) {
-        r->schema_end = r->schema_start + 5;
-
-    } else
-#endif
-    {
-        r->schema_end = r->schema_start + 4;
+    r->schema.data = ngx_pstrdup(pool, &parent->request->schema);
+    if (r->schema.data == NULL) {
+        goto close;
     }
+
+    r->schema.len = parent->request->schema.len;
 
     value.data = ngx_pstrdup(pool, path);
     if (value.data == NULL) {
@@ -2675,11 +2674,13 @@ error:
 
     if (rc == NGX_ABORT) {
         /* header handler has already finalized request */
+        ngx_http_run_posted_requests(fc);
         return NULL;
     }
 
     if (rc == NGX_DECLINED) {
         ngx_http_finalize_request(r, NGX_HTTP_BAD_REQUEST);
+        ngx_http_run_posted_requests(fc);
         return NULL;
     }
 
@@ -2895,7 +2896,7 @@ ngx_http_v2_get_frame(ngx_http_v2_connection_t *h2c, size_t length,
 
         frame->blocked = 0;
 
-    } else {
+    } else if (h2c->frames < 10000) {
         pool = h2c->pool ? h2c->pool : h2c->connection->pool;
 
         frame = ngx_pcalloc(pool, sizeof(ngx_http_v2_out_frame_t));
@@ -2919,6 +2920,15 @@ ngx_http_v2_get_frame(ngx_http_v2_connection_t *h2c, size_t length,
         frame->last = frame->first;
 
         frame->handler = ngx_http_v2_frame_handler;
+
+        h2c->frames++;
+
+    } else {
+        ngx_log_error(NGX_LOG_INFO, h2c->connection->log, 0,
+                      "http2 flood detected");
+
+        h2c->connection->error = 1;
+        return NULL;
     }
 
 #if (NGX_DEBUG)
@@ -3474,7 +3484,10 @@ ngx_http_v2_parse_method(ngx_http_request_t *r, ngx_str_t *value)
 static ngx_int_t
 ngx_http_v2_parse_scheme(ngx_http_request_t *r, ngx_str_t *value)
 {
-    if (r->schema_start) {
+    u_char      c, ch;
+    ngx_uint_t  i;
+
+    if (r->schema.len) {
         ngx_log_error(NGX_LOG_INFO, r->connection->log, 0,
                       "client sent duplicate :scheme header");
 
@@ -3488,8 +3501,27 @@ ngx_http_v2_parse_scheme(ngx_http_request_t *r, ngx_str_t *value)
         return NGX_DECLINED;
     }
 
-    r->schema_start = value->data;
-    r->schema_end = value->data + value->len;
+    for (i = 0; i < value->len; i++) {
+        ch = value->data[i];
+
+        c = (u_char) (ch | 0x20);
+        if (c >= 'a' && c <= 'z') {
+            continue;
+        }
+
+        if (((ch >= '0' && ch <= '9') || ch == '+' || ch == '-' || ch == '.')
+            && i > 0)
+        {
+            continue;
+        }
+
+        ngx_log_error(NGX_LOG_INFO, r->connection->log, 0,
+                      "client sent invalid :scheme header: \"%V\"", value);
+
+        return NGX_DECLINED;
+    }
+
+    r->schema = *value;
 
     return NGX_OK;
 }
@@ -3552,14 +3584,14 @@ ngx_http_v2_construct_request_line(ngx_http_request_t *r)
     static const u_char ending[] = " HTTP/2.0";
 
     if (r->method_name.len == 0
-        || r->schema_start == NULL
+        || r->schema.len == 0
         || r->unparsed_uri.len == 0)
     {
         if (r->method_name.len == 0) {
             ngx_log_error(NGX_LOG_INFO, r->connection->log, 0,
                           "client sent no :method header");
 
-        } else if (r->schema_start == NULL) {
+        } else if (r->schema.len == 0) {
             ngx_log_error(NGX_LOG_INFO, r->connection->log, 0,
                           "client sent no :scheme header");
 
@@ -3722,18 +3754,22 @@ ngx_http_v2_construct_cookie_header(ngx_http_request_t *r)
 static void
 ngx_http_v2_run_request(ngx_http_request_t *r)
 {
+    ngx_connection_t  *fc;
+
+    fc = r->connection;
+
     if (ngx_http_v2_construct_request_line(r) != NGX_OK) {
-        return;
+        goto failed;
     }
 
     if (ngx_http_v2_construct_cookie_header(r) != NGX_OK) {
-        return;
+        goto failed;
     }
 
     r->http_state = NGX_HTTP_PROCESS_REQUEST_STATE;
 
     if (ngx_http_process_request_header(r) != NGX_OK) {
-        return;
+        goto failed;
     }
 
     if (r->headers_in.content_length_n > 0 && r->stream->in_closed) {
@@ -3743,7 +3779,7 @@ ngx_http_v2_run_request(ngx_http_request_t *r)
         r->stream->skip_data = 1;
 
         ngx_http_finalize_request(r, NGX_HTTP_BAD_REQUEST);
-        return;
+        goto failed;
     }
 
     if (r->headers_in.content_length_n == -1 && !r->stream->in_closed) {
@@ -3751,6 +3787,10 @@ ngx_http_v2_run_request(ngx_http_request_t *r)
     }
 
     ngx_http_process_request(r);
+
+failed:
+
+    ngx_http_run_posted_requests(fc);
 }
 
 
@@ -4471,11 +4511,18 @@ ngx_http_v2_idle_handler(ngx_event_t *rev)
 
 #endif
 
-    c->destroyed = 0;
-    ngx_reusable_connection(c, 0);
-
     h2scf = ngx_http_get_module_srv_conf(h2c->http_connection->conf_ctx,
                                          ngx_http_v2_module);
+
+    if (h2c->idle++ > 10 * h2scf->max_requests) {
+        ngx_log_error(NGX_LOG_INFO, h2c->connection->log, 0,
+                      "http2 flood detected");
+        ngx_http_v2_finalize_connection(h2c, NGX_HTTP_V2_NO_ERROR);
+        return;
+    }
+
+    c->destroyed = 0;
+    ngx_reusable_connection(c, 0);
 
     h2c->pool = ngx_create_pool(h2scf->pool_size, h2c->connection->log);
     if (h2c->pool == NULL) {

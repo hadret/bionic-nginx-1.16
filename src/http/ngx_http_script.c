@@ -271,6 +271,34 @@ ngx_http_test_predicates(ngx_http_request_t *r, ngx_array_t *predicates)
 }
 
 
+ngx_int_t
+ngx_http_test_required_predicates(ngx_http_request_t *r,
+    ngx_array_t *predicates)
+{
+    ngx_str_t                  val;
+    ngx_uint_t                 i;
+    ngx_http_complex_value_t  *cv;
+
+    if (predicates == NULL) {
+        return NGX_OK;
+    }
+
+    cv = predicates->elts;
+
+    for (i = 0; i < predicates->nelts; i++) {
+        if (ngx_http_complex_value(r, &cv[i], &val) != NGX_OK) {
+            return NGX_ERROR;
+        }
+
+        if (val.len == 0 || (val.len == 1 && val.data[0] == '0')) {
+            return NGX_DECLINED;
+        }
+    }
+
+    return NGX_OK;
+}
+
+
 char *
 ngx_http_set_predicate_slot(ngx_conf_t *cf, ngx_command_t *cmd, void *conf)
 {
@@ -695,7 +723,8 @@ ngx_http_script_add_copy_code(ngx_http_script_compile_t *sc, ngx_str_t *value,
         return NGX_ERROR;
     }
 
-    code->code = (ngx_http_script_code_pt) ngx_http_script_copy_len_code;
+    code->code = (ngx_http_script_code_pt) (void *)
+                                                 ngx_http_script_copy_len_code;
     code->len = len;
 
     size = (sizeof(ngx_http_script_copy_code_t) + len + sizeof(uintptr_t) - 1)
@@ -784,7 +813,8 @@ ngx_http_script_add_var_code(ngx_http_script_compile_t *sc, ngx_str_t *name)
         return NGX_ERROR;
     }
 
-    code->code = (ngx_http_script_code_pt) ngx_http_script_copy_var_len_code;
+    code->code = (ngx_http_script_code_pt) (void *)
+                                             ngx_http_script_copy_var_len_code;
     code->index = (uintptr_t) index;
 
     code = ngx_http_script_add_code(*sc->values,
@@ -1178,8 +1208,8 @@ ngx_http_script_add_capture_code(ngx_http_script_compile_t *sc, ngx_uint_t n)
         return NGX_ERROR;
     }
 
-    code->code = (ngx_http_script_code_pt)
-                      ngx_http_script_copy_capture_len_code;
+    code->code = (ngx_http_script_code_pt) (void *)
+                                         ngx_http_script_copy_capture_len_code;
     code->n = 2 * n;
 
 
@@ -1293,7 +1323,8 @@ ngx_http_script_add_full_name_code(ngx_http_script_compile_t *sc)
         return NGX_ERROR;
     }
 
-    code->code = (ngx_http_script_code_pt) ngx_http_script_full_name_len_code;
+    code->code = (ngx_http_script_code_pt) (void *)
+                                            ngx_http_script_full_name_len_code;
     code->conf_prefix = sc->conf_prefix;
 
     code = ngx_http_script_add_code(*sc->values,
