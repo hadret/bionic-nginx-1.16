@@ -12,7 +12,7 @@ Production ready.
 
 = Version =
 
-This document describes ngx_lua [https://github.com/openresty/lua-nginx-module/tags v0.10.14] released on February 23rd, 2019.
+This document describes ngx_lua [https://github.com/openresty/lua-nginx-module/tags v0.10.15] released on March 14th, 2019.
 
 = Synopsis =
 <geshi lang="nginx">
@@ -834,6 +834,34 @@ The basic building blocks of scripting Nginx with Lua are directives. Directives
 how the result will be used. Below is a diagram showing the order in which directives are executed.
 
 ![Lua Nginx Modules Directives](https://cloud.githubusercontent.com/assets/2137369/15272097/77d1c09e-1a37-11e6-97ef-d9767035fc3e.png)
+
+== lua_load_resty_core ==
+
+'''syntax:''' ''lua_load_resty_core on|off''
+
+'''default:''' ''lua_load_resty_core on''
+
+'''context:''' ''http''
+
+Controls whether the <code>resty.core</code> module (from
+[https://github.com/openresty/lua-resty-core lua-resty-core]) should be loaded
+or not. When enabled, this directive is equivalent to executing the following
+when the Lua VM is created:
+
+<geshi lang="lua">
+    require "resty.core"
+</geshi>
+
+Note that usage of the <code>resty.core</code> module is recommended, as its
+FFI implementation is both faster, safer, and more complete than the Lua C API
+of the ngx_lua module.
+
+It must also be noted that the Lua C API of the ngx_lua module will eventually
+be removed, and usage of the FFI-based API (i.e. the <code>resty.core</code>
+module) will become mandatory. This directive only aims at providing a
+temporary backwards-compatibility mode in case of edge-cases.
+
+This directive was first introduced in the <code>v0.10.15</code> release.
 
 == lua_capture_error_log ==
 '''syntax:''' ''lua_capture_error_log size''
@@ -5639,7 +5667,7 @@ See also [[#ngx.shared.DICT.flush_expired|ngx.shared.DICT.flush_expired]] and [[
 
 Flushes out the expired items in the dictionary, up to the maximal number specified by the optional <code>max_count</code> argument. When the <code>max_count</code> argument is given <code>0</code> or not given at all, then it means unlimited. Returns the number of items that have actually been flushed.
 
-Unlike the [[#ngx.shared.DICT.flush_all|flush_all]] method, this method actually free up the memory used by the expired items.
+Unlike the [[#ngx.shared.DICT.flush_all|flush_all]] method, this method actually frees up the memory used by the expired items.
 
 This feature was first introduced in the <code>v0.6.3</code> release.
 
