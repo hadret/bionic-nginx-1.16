@@ -13,9 +13,9 @@ Date::Parse - Parse date strings into time values
 =head1 SYNOPSIS
 
 	use Date::Parse;
-
+	
 	$time = str2time($date);
-
+	
 	($ss,$mm,$hh,$day,$month,$year,$zone) = strptime($date);
 
 =head1 DESCRIPTION
@@ -157,7 +157,7 @@ sub
  $dtstr =~ s#([\d\w\s])[\.\,]\s#$1 #sog;
  $dtstr =~ s#($daypat)\s*(den\s)?# #o;
  # Time: 12:00 or 12:00:00 with optional am/pm
-
+  
  if($dtstr =~ s#[:\s](\d\d?):(\d\d)(:(\d\d)(?:\.\d+)?)?\s*([ap]\.?m\.?)?\s# #o)
   {
    ($hh,$mm,$ss) = ($1,$2,$4 || 0);
@@ -165,24 +165,24 @@ sub
   }
 
  # Time: 12 am
-
+  
  elsif($dtstr =~ s#\s(\d\d?)\s*([ap]\.?m\.?)\s# #o)
   {
    ($hh,$mm,$ss) = ($1,0,0);
    $merid = $ampm{$2};
   }
-
+  
  # Date: 12-June-96 (using - . or /)
-
+  
  if($dtstr =~ s#\s(\d\d?)([\-\./])($monpat)(\2(\d\d+))?\s# #o)
   {
    ($month,$day) = ($month{$3},$1);
    $year = $5
         if($5);
   }
-
+  
  # Date: 12-12-96 (using '-', '.' or '/' )
-
+  
  elsif($dtstr =~ s#\s(\d\d*)([\-\./])(\d\d?)(\2(\d\d+))?\s# #o)
   {
    ($month,$day) = ($1 - 1,$3);
@@ -191,7 +191,7 @@ sub
      $year = $5;
      # Possible match for 1995-01-24 (short mainframe date format);
      ($year,$month,$day) = ($1, $3 - 1, $5)
-	    if($month > 12);
+    	    if($month > 12);
     }
   }
  elsif($dtstr =~ s#\s(\d+)\s*($sufpat)?\s*($monpat)# #o)
@@ -215,7 +215,7 @@ sub
 
  # Zone
 
- if($dtstr =~ s#\s"?(\w{3,})\s# #o)
+ if($dtstr =~ s#\s"?(\w{3,})\s# #o) 
   {
    $zone = tz_offset($1);
    return ()
@@ -285,7 +285,8 @@ sub str2time
 	unless(defined $year);
 
  return defined $zone ? timegm($ss,$mm,$hh,$day,$month,$year) - $zone
-		      : timelocal($ss,$mm,$hh,$day,$month,$year);
+    	    	      : timelocal($ss,$mm,$hh,$day,$month,$year);
 }
 
 1;
+

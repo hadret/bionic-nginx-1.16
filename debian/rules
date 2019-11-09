@@ -100,6 +100,7 @@ core_configure_flags := \
                         --with-stream_ssl_module \
                         --with-mail=dynamic \
                         --with-mail_ssl_module \
+			--add-module=$(MODULESDIR)/brotli \
                         --add-dynamic-module=$(MODULESDIR)/http-geoip2
 
 full_configure_flags := \
@@ -115,6 +116,7 @@ full_configure_flags := \
 			--with-stream_ssl_preread_module \
 			--with-mail=dynamic \
 			--with-mail_ssl_module \
+			--add-module=$(MODULESDIR)/brotli \
 			--add-module=$(MODULESDIR)/http-upstream-check \
 			--add-dynamic-module=$(MODULESDIR)/http-auth-ldap \
 			--add-dynamic-module=$(MODULESDIR)/http-auth-pam \
@@ -146,6 +148,7 @@ extras_configure_flags := \
 			--with-stream \
 			--with-stream_ssl_module \
 			--with-stream_ssl_preread_module \
+			--add-module=$(MODULESDIR)/brotli \
 			--add-module=$(MODULESDIR)/http-upstream-check \
 			--add-dynamic-module=$(MODULESDIR)/http-upsync \
 			--add-dynamic-module=$(MODULESDIR)/http-headers-more-filter \

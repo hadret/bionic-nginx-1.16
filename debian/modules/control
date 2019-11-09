@@ -67,7 +67,7 @@ Version: 1.2.1
 
 Module: http-upsync
 Homepage: https://github.com/weibocom/nginx-upsync-module
-Version: v2.1.0
+Version: 2.1.1
 
 Module: http-vhost-traffic-status
 Homepage: https://github.com/vozlt/nginx-module-vts
@@ -83,7 +83,7 @@ Version: 219131a
 
 Module: http-geoip2
 Homepage: https://github.com/leev/ngx_http_geoip2_module
-Version: 3.2
+Version: 3.3
 
 Module: stream-server-traffic-status
 Homepage: https://github.com/vozlt/nginx-module-stream-sts
@@ -93,3 +93,6 @@ Module: http-stream-server-traffic-status
 Homepage: https://github.com/vozlt/nginx-module-sts
 Version: v0.1.1
 
+Module: brotli
+Homepage: https://github.com/google/ngx_brotli
+Version: master

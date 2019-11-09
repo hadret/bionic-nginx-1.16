@@ -162,7 +162,7 @@ This module provides a method to discover backend servers. Supporting dynamicly 
 
 * stability
 
-      Even if one pulling failed, it will pull next upsync_interval, so guarantying backend server stably provides service. And support dumping the latest config to location, so even if consul/etcd hung up, and nginx can be reload anytime.
+      Even if one pulling failed, it will pull next upsync_interval, so guarantying backend server stably provides service. And support dumping the latest config to location, so even if consul/etcd hung up, and nginx can be reload anytime. 
 
 * health_check
 
@@ -200,7 +200,7 @@ The parameters' meanings are:
 
     when strong_dependency is on, nginx will pull servers from consul/etcd every time when nginx start up or reload.
 
-[Back to TOC](#table-of-contents)
+[Back to TOC](#table-of-contents)       
 
 upsync_dump_path
 -----------
@@ -212,7 +212,7 @@ context: upstream
 
 description: dump the upstream backends to the $path.
 
-[Back to TOC](#table-of-contents)
+[Back to TOC](#table-of-contents)       
 
 upsync_lb
 -----------
@@ -224,7 +224,7 @@ context: upstream
 
 description: mainly for least_conn and hash consistent, when using one of them, you must point out using upsync_lb.
 
-[Back to TOC](#table-of-contents)
+[Back to TOC](#table-of-contents)       
 
 upstream_show
 -----------
@@ -252,7 +252,7 @@ curl http://127.0.0.1:8500/upstream_list;
 show all upstreams.
 ```
 
-[Back to TOC](#table-of-contents)
+[Back to TOC](#table-of-contents)       
 
 Consul_interface
 ======
@@ -318,7 +318,7 @@ or
     curl http://$consul_ip:$port/v1/kv/upstreams/$upstream_name?recurse
 ```
 
-[Back to TOC](#table-of-contents)
+[Back to TOC](#table-of-contents)       
 
 Etcd_interface
 ======
@@ -358,7 +358,7 @@ mainly like etcd, http_interface example:
     curl http://$etcd_ip:$port/v2/keys/upstreams/$upstream_name
 ```
 
-[Back to TOC](#table-of-contents)
+[Back to TOC](#table-of-contents)       
 
 Check_module
 ======
@@ -406,7 +406,7 @@ http {
 }
 ```
 
-[Back to TOC](#table-of-contents)
+[Back to TOC](#table-of-contents)       
 
 TODO
 ====
@@ -502,3 +502,5 @@ source dependency
 * http-parser: https://github.com/nodejs/http-parser
 
 [back to toc](#table-of-contents)
+
+

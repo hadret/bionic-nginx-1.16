@@ -46,7 +46,7 @@
 #define NGX_HTTP_LB_HASH_MODULA    8
 #define NGX_HTTP_LB_HASH_KETAMA    16
 
-#if (NGX_HTTP_UPSTREAM_CHECK)
+#if (NGX_HTTP_UPSTREAM_CHECK) 
 
 extern ngx_uint_t ngx_http_upstream_check_add_dynamic_peer(ngx_pool_t *pool,
     ngx_http_upstream_srv_conf_t *uscf, ngx_addr_t *peer_addr);
@@ -81,7 +81,7 @@ typedef struct {
 /****************************hash_end*******************************/
 
 
-static int ngx_libc_cdecl ngx_http_upsync_chash_cmp_points(const void *one,
+static int ngx_libc_cdecl ngx_http_upsync_chash_cmp_points(const void *one, 
     const void *two);
 static ngx_int_t ngx_http_upsync_chash_init(ngx_http_upstream_srv_conf_t *uscf,
     ngx_http_upstream_rr_peers_t *tmp_peers);
@@ -249,7 +249,7 @@ ngx_http_upsync_chash_init(ngx_http_upstream_srv_conf_t *uscf,
     }
 
     points->number = i + 1;
-
+    
     return NGX_OK;
 }
 
@@ -265,7 +265,7 @@ ngx_http_upsync_del_chash_peer(ngx_http_upstream_srv_conf_t *uscf)
     ngx_http_upstream_rr_peer_t              *peer;
     ngx_http_upstream_rr_peers_t             *peers;
     ngx_http_upstream_chash_points_t         *points;
-    ngx_http_upstream_hash_srv_conf_t        *hcf;
+    ngx_http_upstream_hash_srv_conf_t        *hcf;    
     union {
         uint32_t                              value;
         u_char                                byte[4];
@@ -273,7 +273,7 @@ ngx_http_upsync_del_chash_peer(ngx_http_upstream_srv_conf_t *uscf)
 
     hcf = ngx_http_conf_upstream_srv_conf(uscf, ngx_http_upstream_hash_module);
     if(hcf->points == NULL) {
-        return 0;
+        return 0;    
     }
 
     peers = uscf->peer.data;

@@ -1,3 +1,12 @@
+nginx (1.16.1-2bionic0) bionic; urgency=medium
+
+  * Non-maintainer upload.
+  * feat: introduce brotli support (in extras & full).
+  * feat: http-upsync: Upgrade to 2.1.1.
+  * feat: http-geoip2: Upgrade to 3.3.
+
+ -- Filip Chabik <hadret@gmail.com>  Sat, 09 Nov 2019 15:17:45 +0000
+
 nginx (1.16.1-1bionic0) bionic; urgency=medium
 
   * Non-maintainer upload.

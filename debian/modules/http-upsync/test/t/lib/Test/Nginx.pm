@@ -278,7 +278,7 @@ sub waitforsocket($) {
 }
 
 sub reload() {
-	my ($self) = @_;
+	my ($self) = @_; 
 
 	return $self unless $self->{_started};
 
@@ -356,7 +356,7 @@ sub read_file($) {
     open F, '<', $self->{_testdir} . '/' . $name or die "Can't open $name: $!";
     my $content = <F>;
     close F;
-
+    
     return $content;
 }
 
