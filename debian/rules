@@ -9,6 +9,7 @@ FLAVOURS := core full light extras
 DYN_MODS := \
 	http-auth-ldap \
 	http-auth-pam \
+	http-brotli \
 	http-cache-purge \
 	http-dav-ext \
 	http-echo \
@@ -100,7 +101,6 @@ core_configure_flags := \
                         --with-stream_ssl_module \
                         --with-mail=dynamic \
                         --with-mail_ssl_module \
-			--add-module=$(MODULESDIR)/brotli \
                         --add-dynamic-module=$(MODULESDIR)/http-geoip2
 
 full_configure_flags := \
@@ -116,10 +116,10 @@ full_configure_flags := \
 			--with-stream_ssl_preread_module \
 			--with-mail=dynamic \
 			--with-mail_ssl_module \
-			--add-module=$(MODULESDIR)/brotli \
 			--add-module=$(MODULESDIR)/http-upstream-check \
 			--add-dynamic-module=$(MODULESDIR)/http-auth-ldap \
 			--add-dynamic-module=$(MODULESDIR)/http-auth-pam \
+			--add-dynamic-module=$(MODULESDIR)/http-brotli \
 			--add-dynamic-module=$(MODULESDIR)/http-dav-ext \
 			--add-dynamic-module=$(MODULESDIR)/http-echo \
 			--add-dynamic-module=$(MODULESDIR)/http-geoip2 \
@@ -148,12 +148,12 @@ extras_configure_flags := \
 			--with-stream \
 			--with-stream_ssl_module \
 			--with-stream_ssl_preread_module \
-			--add-module=$(MODULESDIR)/brotli \
 			--add-module=$(MODULESDIR)/http-upstream-check \
 			--add-dynamic-module=$(MODULESDIR)/http-upsync \
 			--add-dynamic-module=$(MODULESDIR)/http-headers-more-filter \
 			--add-dynamic-module=$(MODULESDIR)/http-auth-ldap \
 			--add-dynamic-module=$(MODULESDIR)/http-auth-pam \
+			--add-dynamic-module=$(MODULESDIR)/http-brotli \
 			--add-dynamic-module=$(MODULESDIR)/http-cache-purge \
 			--add-dynamic-module=$(MODULESDIR)/http-dav-ext \
 			--add-dynamic-module=$(MODULESDIR)/http-ndk \

@@ -77,6 +77,10 @@ Module: http-auth-ldap
 Homepage: https://github.com/kvspb/nginx-auth-ldap
 Version: master
 
+Module: http-brotli
+Homepage: https://github.com/google/ngx_brotli
+Version: master
+
 Module: http-upstream-check
 Homepage: https://github.com/xiaokai-wang/nginx_upstream_check_module
 Version: 219131a
@@ -93,6 +97,3 @@ Module: http-stream-server-traffic-status
 Homepage: https://github.com/vozlt/nginx-module-sts
 Version: v0.1.1
 
-Module: brotli
-Homepage: https://github.com/google/ngx_brotli
-Version: master

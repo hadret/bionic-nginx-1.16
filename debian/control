@@ -107,6 +107,7 @@ Architecture: any
 Depends: iproute2,
          libnginx-mod-http-auth-ldap (= ${binary:Version}),
          libnginx-mod-http-auth-pam (= ${binary:Version}),
+         libnginx-mod-http-brotli (= ${binary:Version}),
          libnginx-mod-http-dav-ext (= ${binary:Version}),
          libnginx-mod-http-echo (= ${binary:Version}),
          libnginx-mod-http-geoip2 (= ${binary:Version}),
@@ -182,6 +183,7 @@ Architecture: any
 Depends: iproute2,
          libnginx-mod-http-auth-ldap (= ${binary:Version}),
          libnginx-mod-http-auth-pam (= ${binary:Version}),
+         libnginx-mod-http-brotli (= ${binary:Version}),
          libnginx-mod-http-cache-purge (= ${binary:Version}),
          libnginx-mod-http-dav-ext (= ${binary:Version}),
          libnginx-mod-http-echo (= ${binary:Version}),
@@ -449,6 +451,18 @@ Description: LDAP authentication module for Nginx
  .
  The module uses LDAP as a backend for simple http authentication. It
  also allows one to use multiple LDAP servers.
+
+Package: libnginx-mod-http-brotli
+Architecture: any
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Description: brotli compression module for Nginx
+ generic-purpose lossless compression algorithm that compresses data using a
+ combination of a modern variant of the LZ77 algorithm, Huffman coding and 2nd
+ order context modeling, with a compression ratio comparable to the best
+ currently available general-purpose compression methods. It is similar in speed
+ with deflate but offers more dense compression.
+ .
+ This package provides both on-the-fly and static modules.
 
 Package: libnginx-mod-http-upsync
 Architecture: any
