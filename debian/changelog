@@ -1,3 +1,22 @@
+nginx (1.16.1-4+bionic1) bionic; urgency=medium
+
+  * Non-maintainer upload.
+  * Switch to new versioning scheme.
+  * SECURITY UPDATE: request smuggling via error_page
+    - debian/patches/CVE-2019-20372.patch: discard request body when
+      redirecting to a URL via error_page in
+      src/http/ngx_http_special_response.c.
+    - CVE-2019-20372
+
+ -- Filip Chabik <hadret@gmail.com>  Tue, 14 Jan 2020 11:08:51 +0000
+
+nginx (1.16.1-3bionic1) bionic; urgency=medium
+
+  * Non-maintainer upload.
+  * feat: http-upsync: Upgrade to 2.1.2.
+
+ -- Filip Chabik <hadret@gmail.com>  Fri, 03 Jan 2020 10:59:23 +0000
+
 nginx (1.16.1-2bionic1) bionic; urgency=medium
 
   * Non-maintainer upload.
